@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class ArgumentParser {
-    private String path = "/";
+    private String path = "";
     private String prefix = "";
     private boolean appendToFile = false;
     private boolean needShortStats = false;
@@ -9,10 +9,17 @@ public class ArgumentParser {
     private ArrayList<String> inputFiles = new ArrayList<>();
 
     public ArgumentParser(String[] args){
-        parseArguments(args);
+        try {
+            parseArguments(args);
+        }catch (IllegalArgumentException e){
+            System.err.println("Ошибка в аргументах командной строки: " + e.getMessage());
+        }
     }
 
     private void parseArguments(String[] args){
+        if (args.length == 0){
+            throw new IllegalArgumentException("Не указаны входные данные");
+        }
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
             if (s.startsWith("-")) {
@@ -22,7 +29,7 @@ public class ArgumentParser {
                         i++;
                         break;
                     case "-p":
-                        path += args[i + 1];
+                        prefix = args[i + 1];
                         i++;
                         break;
                     case "-a":

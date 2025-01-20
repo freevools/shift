@@ -1,35 +1,46 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
-//-o задаёт путь для результатов
-//-p задает префикс имен выходных файлов.
-//-a задать режим добавления в существующие файлы, а не перезаписывать
-//-s краткая статистика
-//-f полная статистика
+
 public class Main {
 
     public static void main(String[] args) {
 
         ArgumentParser argParser = new ArgumentParser(args);
+        ArrayList<String> allLines = new ArrayList<>();
 
-        ArrayList<String> inputFiles = argParser.getInputFiles();
-        ArrayList<Double> doubles = new ArrayList<>();
-        ArrayList<Integer> integers = new ArrayList<>();
-        ArrayList<String> strings = new ArrayList<>();
+        for (String file: argParser.getInputFiles()){
+            try {
+                allLines.addAll(FileManager.readFiles(file));
+            }catch (Exception e){
+                System.err.println("Ошибка при чтении файла " + file + ": " + e.getMessage());
+            }
+        }
+
+        LineParser lineParser = new LineParser();
+        for(String line: allLines){
+            lineParser.splitLine(line);
+        }
+
+        ArrayList<Double> doubles = lineParser.getDoubles();
+        ArrayList<Integer> integers = lineParser.getIntegers();
+        ArrayList<String> strings = lineParser.getStrings();
+
+        try {
+            FileManager.writeToFile(argParser.getPath() + argParser.getPrefix() + "floats.txt",doubles, argParser.isAppendToFile());
+            FileManager.writeToFile(argParser.getPath() + argParser.getPrefix() + "integers.txt",integers, argParser.isAppendToFile());
+            FileManager.writeToFile(argParser.getPath() + argParser.getPrefix() + "strings.txt",strings, argParser.isAppendToFile());
+        }catch (Exception e){
+            System.err.println("Ошибка при записи в файл: " + e.getMessage());
+        }
 
         if (argParser.isNeedShortStats()){
-            StatsCalculator.shortStats(integers);
-            StatsCalculator.shortStats(doubles);
-            StatsCalculator.shortStats(strings);
+            StatsCalculator.shortStats("double", doubles);
+            StatsCalculator.shortStats("integer",integers);
+            StatsCalculator.shortStats("string", strings);
         }
         if (argParser.isNeedFullStats()){
             StatsCalculator.fullStatsForNumbers(doubles);
             StatsCalculator.fullStatsForNumbers(integers);
             StatsCalculator.fullStatsForString(strings);
         }
-
-
     }
 }

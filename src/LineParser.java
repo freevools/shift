@@ -8,10 +8,10 @@ public class LineParser {
     public void splitLine(String line) {
         try {
             integers.add(Integer.parseInt(line));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException e1) {
             try {
                 doubles.add(Double.parseDouble(line));
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException e2) {
                 strings.add(line);
             }
         }
